@@ -1,4 +1,3 @@
-#import MySQLdb
 import smtplib
 import string
 from email.mime.text import MIMEText
@@ -26,10 +25,8 @@ def password():
     return render_template('pass.html')
 
 
-#@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
-#@app.route('/login', methods=['GET', 'POST'])
-def login():
+def userLogin():
     global cursor
     error = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
@@ -38,20 +35,37 @@ def login():
         print(username, password)
         conn = mysql.connect()
         cursor = conn.cursor()
-        stmt = "select * from employee where username=\"%s\" and password=\"%s\""%(username,password)
+        stmt = "select * from users where username=\"%s\" and password=\"%s\""%(username,password)
         sql1 = cursor.execute(stmt)
         sql1 = cursor.fetchone()
         if sql1:
-            return render_template('employees.html', data=sql1)
+            return render_template('userProfile.html', data=sql1)
         else:
             error = "Invalid Username or Password"
             return render_template('login.html', loginError=error)
     return render_template('login.html')
 
 
+@app.route('/adminLogin',methods=['GET','POST'])
+def adminLogin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username=="admin" and password=="admin@123":
+            return render_template('dashboard.html')
+        
+
+@app.route('/adminLogout')
+def adminLogout():
+    return render_template('adminLogin.html')
+
 @app.route('/view')
 def View():
     return render_template('view.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('adminLogin.html')
 
 @app.route('/home')
 def home1():
@@ -63,30 +77,36 @@ def form():
 
 
 @app.route('/logout')
+def logout():
+    return render_template('login.html')
 
+@app.route('/employeeList')
+def emp_list():
+    return render_template('employeeList.html')
 
-@app.route("/add", methods=["POST"])
-def home():
+@app.route("/register", methods=["POST"])
+def register():
     global cursor
     try:
+        _firstName = request.form.get('firstName')
+        _lastName = request.form.get('lastName')
         _name = request.form.get('username')
         _email = request.form.get('email')
-        _salary = request.form.get('salary')
         _password = request.form.get('password')
         conn = mysql.connect()
         cursor = conn.cursor()
-        stmt = "select * from employee where username=\"%s\""%(_name)
+        stmt = "select * from users where username=\"%s\""%(_name)
         sql1 = cursor.execute(stmt)
         sql1 = cursor.fetchone()
         if sql1 is None:
-            sql = "INSERT INTO employee(username, email,salary,password) VALUES(%s, %s ,  %s , %s)"
-            data = (_name, _email, _salary, _password)
+            sql = "INSERT INTO users(firstname,lastname,username,password,email) VALUES(%s,%s,%s,  %s , %s)"
+            data = (_firstName,_lastName,_name,_password, _email)
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sql, data)
             conn.commit()
-            data = (_name,_email,_salary)
-            return render_template('employees.html', data=data)
+            data = (_firstName,_lastName,_name,_email)
+            return render_template('userProfile.html', data=data)
         else:
             errorMessage = "Username is already exist"
             return render_template("login.html",error=errorMessage)
@@ -167,11 +187,11 @@ def kyc():
             _acc_type = request.form.get('acc_type')
             conn = mysql.connect()
             cursor = conn.cursor()
-            stmt = "select * from users where name=\"%s\"" % (_name)
+            stmt = "select * from kycForm where name=\"%s\"" % (_name)
             sql1 = cursor.execute(stmt)
             sql1 = cursor.fetchone()
             if sql1 is None:
-                stmt = "INSERT INTO users(name, dob,ID,email,phone,address,income,emp_status,acc_type,aadhar,pan_number) VALUES('{0}', '{1}', '{2}' , '{3}', '{4}', '{5}', '{6}', '{7}','{8}','{9}','{10}');".format(_name,_dob,_id, _email, _phone, _address, _income, _emp_status, _acc_type,_aadhar,_panno)
+                stmt = "INSERT INTO kycForm(name, dob,ID,email,phone,address,income,emp_status,acc_type,aadhar,panno) VALUES('{0}', '{1}', '{2}' , '{3}', '{4}', '{5}', '{6}', '{7}','{8}','{9}','{10}');".format(_name,_dob,_id, _email, _phone, _address, _income, _emp_status, _acc_type,_aadhar,_panno)
                 conn = mysql.connect()
                 cursor = conn.cursor()
                 cursor.execute(stmt)
@@ -206,25 +226,23 @@ def get_emp():
     finally:
         cursor.close()
         conn.close()
-@app.route('/employeeList')
-def employee_list():
+
+
+@app.route('/viewSubmittedForms')
+def viewSubmittedForms():
     try:
         conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users")  # Replace 'employees' with your actual table name
-        employees = cursor.fetchall()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT * FROM kycForm")  # Replace 'employees' with your actual table name
+        forms = cursor.fetchall()
         cursor.close()
-        return render_template('employeelist.html', data=employees)
+        return render_template('kycFormList.html', forms=forms)
     except Exception as e:
         print(e)
         flash("An error occurred while fetching employee data.")
         return redirect(url_for('index'))  # Redirect to the homepage or an error page
 
 
-# Define a route to display the form
-@app.route('/')
-def show_form():
-    return render_template('kyc_form.html')
 
 # Define a route to handle form submission
 @app.route('/submit', methods=['POST'])
@@ -239,10 +257,10 @@ def submit_form():
         address = request.form.get('address')
         income = request.form.get('income')
         employment = request.form.get('emp_status')
-        account_type = request.form.get('account_type')
+        account_type = request.form.get('acc_type')
         conn = mysql.connect()
         cursor = conn.cursor()
-        sql = "INSERT INTO users(name,dob,ID,email,phone,address,income,emp_status,account_type) VALUES(%s, %s , %s , %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO users(name,dob,ID,email,phone,address,income,emp_status,acc_type) VALUES(%s, %s , %s , %s, %s, %s, %s, %s, %s)"
         print(sql)
         data = (name, dob, national_id, email, phone, address, income, employment, account_type)
         conn = mysql.connect()

@@ -1,72 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KYC Customer Acquisition Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+label {
+  padding: 12px 12px 12px 0;
+  display: inline-block;
+}
+
+input[type=submit] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  margin-top:5px;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+.col-25 {
+  float: left;
+  width: 25%;
+  margin-top: 6px;
+}
+
+.col-75 {
+  float: left;
+  width: 75%;
+  margin-top: 6px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .col-25, .col-75, input[type=submit] {
+    width: 100%;
+    margin-top: 0;
+  }
+}
+</style>
 </head>
 <body>
-    <h1>KYC Customer Acquisition Form</h1>
-    {% if status %}
+
+<h2>KYA Form</h2>
+<p>Please fill your details.</p>
+
+{% if status %}
     <h2 style="color:green;">{{status}}</h2>
     {% endif %}
     {% if error %}
     <h2 style="color:red;">{{error}}</h2>
     {% endif %}
-    <form action="/kyc_form" method="post">
-        <fieldset>
-            <legend>Personal Information</legend>
-            <label for="full_name">Full Name:</label>
-            <input type="text" id="full_name" name="name" required><br><br>
 
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" name="dob" required><br><br>
+<div class="container">
+  <form action="/kyc_form" method="post">
+    <div class="row">
+      <div class="col-25">
+        <label for="fname">Full Name</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="fname" name="name" placeholder="Your name..">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label for="subject">Address</label>
+      </div>
+      <div class="col-75">
+        <textarea id="subject" name="address" placeholder="Write your address" style="height:100px"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">Date of Birth</label>
+      </div>
+      <div class="col-75">
+        <input type="date" id="lname" name="dob">
+      </div>
+    </div>
 
-            <label for="national_id">National ID Number:</label>
-            <input type="text" id="national_id" name="ID" required><br><br>
-        </fieldset>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">National ID</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="lname" name="ID">
+      </div>
+    </div>
 
-        <fieldset>
-            <legend>Contact Information</legend>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">Email</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="lname" name="email">
+      </div>
+    </div>
 
-            <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" required><br><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">Phone Number</label>
+      </div>
+      <div class="col-75">
+        <input type="tel" id="lname" name="phone">
+      </div>
+    </div>
 
-            <label for="aadhar">Aadhar Number:</label>
-            <input type="text" id="aadhar" name="aadhar" required><br><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">Aadhar Number</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="lname" name="aadhar">
+      </div>
+    </div>
 
-            <label for="panno">PAN Number:</label>
-            <input type="text" id="panno" name="panno" required><br><br>
-        </fieldset>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">PAN Number</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="lname" name="panno">
+      </div>
+    </div>
 
-        <fieldset>
-            <legend>Address</legend>
-            <label for="address">Address:</label>
-            <textarea id="address" name="address" rows="4" required></textarea><br><br>
-        </fieldset>
+    <div class="row">
+      <div class="col-25">
+        <label for="lname">Annual Income</label>
+      </div>
+      <div class="col-75">
+        <input type="text" id="lname" name="income">
+      </div>
+    </div>
 
-        <fieldset>
-            <legend>Additional Information</legend>
-            <label for="income">Annual Income:</label>
-            <input type="number" id="income" name="income" required><br><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="country">Employement Status</label>
+      </div>
+      <div class="col-75">
+        <select id="country" name="emp_status">
+          <option value="Employeed">Employed</option>
+          <option value="Unemployeed">Unemployeed</option>
+        </select>
+      </div>
+    </div>
 
-            <label for="employment">Employment Status:</label>
-            <select id="employment" name="emp_status" required>
-                <option value="employed">Employed</option>
-                <option value="self_employed">Self-Employed</option>
-                <option value="unemployed">Unemployed</option>
-            </select><br><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="country">Account Type</label>
+      </div>
+      <div class="col-75">
+        <select id="country" name="acc_type">
+          <option value="Savings">Savings</option>
+          <option value="Salary">Salary</option>
+          <option value="Fixed">Fixed</option>
+        </select>
+      </div>
+    </div>
 
-            <label for="account_type">Account Type:</label>
-            <select id="account_type" name="acc_type" required>
-                <option value="savings">Savings</option>
-                <option value="checking">Checking</option>
-            </select><br><br>
-        </fieldset>
+    <div class="row">
+      <input type="submit" value="Submit">
+    </div>
+  </form>
+</div>
 
-        <input type="submit" value="Submit">
-    </form>
 </body>
 </html>
